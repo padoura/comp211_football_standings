@@ -1,0 +1,147 @@
+#!/bin/bash
+argc=$#
+argv=("$@")
+result=""
+LINE_REGEXP="^(\s*\w+\s*)+-(\s*\w+\s*)+:[0-9]+-[0-9]+\s*$"
+RED_COLOR="\033[0;31m"
+BLUE_COLOR="\033[0;34m"
+COLOR_OFF="\033[0m"
+SCALE="2"
+
+function printHelp(){
+    echo "..."
+    echo "@~> Football Standings Calculator <~@"
+    echo "usage: results [ -h or --help ] You are here"
+    echo "            [ -t or --test ] Run all test .txt files in ./testFiles folder"
+    echo "            [ pathToFile ] A file with lines formatted as \"Team1-Team2:Goals1-Goals2\" "
+    echo "e.g.:"
+    echo "{ ./results inputFile }"
+}
+
+function printHelpIfInvoked(){
+    for (( j=0; j<argc; j++ )); do
+        arg=${argv[j]}
+        if [ "$arg" == "--help" ] || [ "$arg" == "-h" ]; then
+            printHelp
+            exit
+        fi 
+    done
+}
+
+function runTest(){
+    find ./testFiles -name '*.txt' | while read i; do echo -e "${BLUE_COLOR}Testing: $i${COLOR_OFF}"; runTestCommand="./results $i"; eval $runTestCommand; done
+}
+
+function runTestIfInvoked(){
+    for (( j=0; j<argc; j++ )); do
+        arg=${argv[j]}
+        if [ "$arg" == "--test" ] || [ "$arg" == "-t" ]; then
+            runTest
+            exit
+        fi 
+    done
+}
+
+function initializeStandings(){
+    rm ${table}.bup 2> /dev/null
+    touch ${table}.bup
+    chmod 777 ${table}.bup
+    while IFS= read -r line; do
+        echo "$line" | cut -f 1 -d"-" >> ${table}.bup
+        echo "$line" | cut -f 2 -d"-" | cut -f 1 -d":" >> ${table}.bup
+    done < $tmpFile
+    sort ${table}.bup | uniq | sed 's/$/,0,0-0/' > $table
+}
+
+function updateTable(){
+    team=$1
+    goalsScored=$2
+    goalsConceded=$3
+    points=$4
+
+    oldLine="$(grep $team $table)"
+    oldPoints="$(echo $oldLine | cut -f 2 -d',')"
+    oldGoalsScored="$(echo $oldLine | cut -f 3 -d',' | cut -f 1 -d'-')"
+    oldGoalsConceded="$(echo $oldLine | cut -f 2 -d'-')"
+
+    newPoints="$(expr $oldPoints + $points)"
+    newGoalsScored="$(expr $oldGoalsScored + $goalsScored)"
+    newGoalsConceded="$(expr $oldGoalsConceded + $goalsConceded)"
+    newLine="$team,$newPoints,$newGoalsScored-$newGoalsConceded"
+
+    cp $table ${table}.bup
+    sed "s/$oldLine/$newLine/" ${table}.bup > $table
+}
+
+function calculateStandings(){
+    while IFS= read -r line; do
+        team1="$(echo "$line" | cut -f 1 -d"-")"
+        team2="$(echo "$line" | cut -f 2 -d"-" | cut -f 1 -d":")"
+        goals1="$(echo "$line" | cut -f 2 -d":" | cut -f 1 -d"-")"
+        goals2="$(echo "$line" | cut -f 3 -d"-")"
+
+        if [ "$goals1" -gt "$goals2" ]; then
+            updateTable $team2 $goals2 $goals1 "0"
+            updateTable $team1 $goals1 $goals2 "3"
+        elif [ "$goals1" -lt "$goals2" ]; then
+            updateTable $team1 $goals1 $goals2 "0"
+            updateTable $team2 $goals2 $goals1 "3"
+        else
+            updateTable $team1 $goals1 $goals2 "1"
+            updateTable $team2 $goals2 $goals1 "1"
+        fi
+    done < $tmpFile
+
+    rm ${table}.bup
+}
+
+function normalizeFile(){
+    echo "" >> $tmpFile
+    sed '/^$/d' $tmpFile | tr -s ' ' | sed "s/ /_/g" > ${tmpFile}.bup
+    cp ${tmpFile}.bup $tmpFile
+    rm ${tmpFile}.bup
+}
+
+function parseInputFiles(){
+    for (( j=0; j<argc; j++ )); do
+        file=${argv[j]}
+        
+        if [[ !( -f "$file" && -s "$file") ]] ; then
+            result="${result}${RED_COLOR}Error, file \"$file\" is invalid${COLOR_OFF}\n"
+        fi
+
+        if [[ -f "$file" && -s "$file" ]] ; then
+            tmpFile=tmp.txt
+            cp $file $tmpFile
+            if [[ !(-z "$(grep -Ev "$LINE_REGEXP" $tmpFile)") ]]; then
+                firstInvalidLine=$(grep -Evn "$LINE_REGEXP" $tmpFile | head -n 1)
+                lineNumber=$(echo $firstInvalidLine | cut -f 1 -d ':')
+                firstInvalidLine=$(grep -Ev "$LINE_REGEXP" $tmpFile | head -n 1)
+                result="${result}${RED_COLOR}Error in \"$file\", invalid line $lineNumber: \"$firstInvalidLine\"\n\tvalid line \"Team1-Team2:Goals1-Goals2\" should be matched by LINE_REGEXP=\"$LINE_REGEXP\" ${COLOR_OFF}\n"
+            else
+                normalizeFile
+                table="table.csv"
+                initializeStandings
+                calculateStandings
+                counter=1
+                result="$(sed 's/,/ /g' $table | sort -k2,2nr -k1,1 | tr ' ' '\t' | tr '_' ' ' | while read i; do printf "$counter.\t$i\n"; counter=$((counter+1)); done)\n"
+                rm $table
+            fi
+            rm $tmpFile
+        fi
+
+    done
+}
+
+function printResult(){
+    printf "$result"
+}
+
+printHelpIfInvoked
+runTestIfInvoked
+parseInputFiles
+printResult
+
+
+
+
