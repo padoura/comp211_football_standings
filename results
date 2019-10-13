@@ -107,7 +107,7 @@ function parseInputFiles(){
         file=${argv[j]}
         
         if [[ !( -f "$file" && -s "$file") ]] ; then
-            result="${result}${RED_COLOR}Error, file \"$file\" is invalid${COLOR_OFF}\n"
+            result="${result}${RED_COLOR}Error, file \"$file\" is missing or empty${COLOR_OFF}\n"
         fi
 
         if [[ -f "$file" && -s "$file" ]] ; then
