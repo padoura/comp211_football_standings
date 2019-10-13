@@ -29,7 +29,7 @@ function printHelpIfInvoked(){
 }
 
 function runTest(){
-    find ./testFiles -name '*.txt' | while read i; do echo -e "${BLUE_COLOR}Testing: $i${COLOR_OFF}"; runTestCommand="./results $i"; eval $runTestCommand; done
+    find ./testfiles -name '*.txt' | while read i; do echo -e "${BLUE_COLOR}Testing: $i${COLOR_OFF}"; runTestCommand="./results $i"; eval $runTestCommand; done
 }
 
 function runTestIfInvoked(){
