@@ -115,21 +115,21 @@ function parseInputFiles(){
     for (( j=0; j<argc; j++ )); do
         file=${argv[j]}
         
-        if [[ !( -f "$file" && -s "$file") ]] ; then
+        if !( [ -f "$file" ] && [ -s "$file" ] ) ; then
             result="${result}${RED_COLOR}Error, file \"$file\" is missing or empty${COLOR_OFF}\n"
         fi
 
-        if [[ -f "$file" && -s "$file" ]] ; then
+        if [ -f "$file" ] && [ -s "$file" ] ; then
             tmpFile=tmp.txt
             cp $file $tmpFile
 
-            if [[ !(-z "$(grep -Ev "$LINE_REGEXP" $tmpFile)") && !(-z "$(grep -Ev "$LINE_REGEXP_W_SPACES" $tmpFile)") ]]; then
+            if ! [ -z "$(grep -Ev "$LINE_REGEXP" $tmpFile)" ] && ! [ -z "$(grep -Ev "$LINE_REGEXP_W_SPACES" $tmpFile)" ]; then
                 firstInvalidLine=$(grep -Evn "$LINE_REGEXP" $tmpFile | head -n 1)
                 lineNumber=$(echo $firstInvalidLine | cut -f 1 -d ':')
                 firstInvalidLine=$(grep -Ev "$LINE_REGEXP" $tmpFile | head -n 1)
                 result="${result}${RED_COLOR}Error in \"$file\", invalid line $lineNumber: \"$firstInvalidLine\"\n\tvalid line \"Team1-Team2:Goals1-Goals2\" should be matched by LINE_REGEXP=\"$LINE_REGEXP\" ${COLOR_OFF}\n"
             else
-                if [[ !(-z "$(grep -Ev "$LINE_REGEXP" $tmpFile)") ]]; then
+                if ! [ -z "$(grep -Ev "$LINE_REGEXP" $tmpFile)" ]; then
                     firstInvalidLine=$(grep -Evn "$LINE_REGEXP" $tmpFile | head -n 1)
                     lineNumber=$(echo $firstInvalidLine | cut -f 1 -d ':')
                     firstInvalidLine=$(grep -Ev "$LINE_REGEXP" $tmpFile | head -n 1)
