@@ -2,7 +2,7 @@
 argc=$#
 argv=("$@")
 result=""
-LINE_REGEXP="^(\s*\w+\s*)+-(\s*\w+\s*)+:[0-9]+-[0-9]+\s*$"
+LINE_REGEXP_W_SPACES="^(\s*\w+\s*)+-(\s*\w+\s*)+:[0-9]+-[0-9]+\s*$"
 RED_COLOR="\033[0;31m"
 BLUE_COLOR="\033[0;34m"
 COLOR_OFF="\033[0m"
@@ -59,7 +59,7 @@ function updateTable(){
     goalsConceded=$3
     points=$4
 
-    oldLine="$(grep $team $table)"
+    oldLine="$(grep $team, $table)"
     oldPoints="$(echo $oldLine | cut -f 2 -d',')"
     oldGoalsScored="$(echo $oldLine | cut -f 3 -d',' | cut -f 1 -d'-')"
     oldGoalsConceded="$(echo $oldLine | cut -f 2 -d'-')"
@@ -113,11 +113,11 @@ function parseInputFiles(){
         if [[ -f "$file" && -s "$file" ]] ; then
             tmpFile=tmp.txt
             cp $file $tmpFile
-            if [[ !(-z "$(grep -Ev "$LINE_REGEXP" $tmpFile)") ]]; then
-                firstInvalidLine=$(grep -Evn "$LINE_REGEXP" $tmpFile | head -n 1)
+            if [[ !(-z "$(grep -Ev "$LINE_REGEXP_W_SPACES" $tmpFile)") ]]; then
+                firstInvalidLine=$(grep -Evn "$LINE_REGEXP_W_SPACES" $tmpFile | head -n 1)
                 lineNumber=$(echo $firstInvalidLine | cut -f 1 -d ':')
-                firstInvalidLine=$(grep -Ev "$LINE_REGEXP" $tmpFile | head -n 1)
-                result="${result}${RED_COLOR}Error in \"$file\", invalid line $lineNumber: \"$firstInvalidLine\"\n\tvalid line \"Team1-Team2:Goals1-Goals2\" should be matched by LINE_REGEXP=\"$LINE_REGEXP\" ${COLOR_OFF}\n"
+                firstInvalidLine=$(grep -Ev "$LINE_REGEXP_W_SPACES" $tmpFile | head -n 1)
+                result="${result}${RED_COLOR}Error in \"$file\", invalid line $lineNumber: \"$firstInvalidLine\"\n\tvalid line \"Team1-Team2:Goals1-Goals2\" should be matched by LINE_REGEXP_W_SPACES=\"$LINE_REGEXP_W_SPACES\" ${COLOR_OFF}\n"
             else
                 normalizeFile
                 table="table.csv"
