@@ -1,0 +1,20 @@
+6a7,11
+> RED_COLOR="\033[0;31m"
+> BLUE_COLOR="\033[0;34m"
+> YELLOW_COLOR="\033[0;33m"
+> COLOR_OFF="\033[0m"
+> SCALE="2"
+29c34
+<     find ./testfiles -name '*.txt' | while read i; do echo -e "Testing: $i"; runTestCommand="./results $i"; eval $runTestCommand; done
+---
+>     find ./testfiles -name '*.txt' | while read i; do echo -e "${BLUE_COLOR}Testing: $i${COLOR_OFF}"; runTestCommand="./results $i"; eval $runTestCommand; done
+113c118
+<         result="${result}Error, file \"$file\" is missing or empty\n"
+---
+>         result="${result}${RED_COLOR}Error, file \"$file\" is missing or empty${COLOR_OFF}\n"
+124c129
+<             result="${result}Error in \"$file\", invalid line $lineNumber: \"$firstInvalidLine\"\n\tvalid line \"Team1-Team2:Goals1-Goals2\" should be matched by LINE_REGEXP=\"$LINE_REGEXP\" \n"
+---
+>             result="${result}${RED_COLOR}Error in \"$file\", invalid line $lineNumber: \"$firstInvalidLine\"\n\tvalid line \"Team1-Team2:Goals1-Goals2\" should be matched by LINE_REGEXP=\"$LINE_REGEXP\" ${COLOR_OFF}\n"
+129a135
+>                 printf "${YELLOW_COLOR}Error in \"$file\", spaces in team at line $lineNumber: \"$firstInvalidLine\"\n\tTrying to continue with spaces...${COLOR_OFF}\n"
