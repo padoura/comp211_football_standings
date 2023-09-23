@@ -1,0 +1,25 @@
+Testing: ./testfiles/scoreseasyTeams1.txt
+1.	Greece	12	5-1
+2.	Italy	6	4-4
+3.	Portugal	3	4-3
+4.	France	0	0-2
+5.	Germany	0	0-3
+Testing: ./testfiles/scoreseasyAllDraws.txt
+1.	Greece	4	4-4
+2.	Italy	4	11-11
+3.	France	2	3-3
+4.	Germany	2	6-6
+5.	Portugal	2	4-4
+Testing: ./testfiles/scoreseasyDrawsLR.txt
+1.	Greece	4	4-4
+2.	Italy	4	11-11
+3.	France	2	3-3
+4.	Germany	2	6-6
+5.	Porto	2	4-4
+Testing: ./testfiles/scoreseasySpaces.txt
+1.	Greece	6	3-1
+2.	Italy	6	4-4
+3.	South_Africa	6	2-0
+4.	Portugal	3	4-3
+5.	France	0	0-2
+6.	Germany	0	0-3

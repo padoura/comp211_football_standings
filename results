@@ -4,11 +4,6 @@ argv=("$@")
 result=""
 LINE_REGEXP="^\w+-\w+:[0-9]+-[0-9]+\s*$"
 LINE_REGEXP_W_SPACES="^(\s*\w+\s*)+-(\s*\w+\s*)+:[0-9]+-[0-9]+\s*$"
-RED_COLOR="\033[0;31m"
-BLUE_COLOR="\033[0;34m"
-YELLOW_COLOR="\033[0;33m"
-COLOR_OFF="\033[0m"
-SCALE="2"
 
 function printHelp(){
     echo "..."
@@ -31,7 +26,7 @@ function printHelpIfInvoked(){
 }
 
 function runTest(){
-    find ./testfiles -name '*.txt' | while read i; do echo -e "${BLUE_COLOR}Testing: $i${COLOR_OFF}"; runTestCommand="./results $i"; eval $runTestCommand; done
+    find ./testfiles -name '*.txt' | while read i; do echo -e "Testing: $i"; runTestCommand="./results $i"; eval $runTestCommand; done
 }
 
 function runTestIfInvoked(){
@@ -115,7 +110,7 @@ function parseInputFiles(){
     file=${argv[0]}
     
     if !( [ -f "$file" ] && [ -s "$file" ] ) ; then
-        result="${result}${RED_COLOR}Error, file \"$file\" is missing or empty${COLOR_OFF}\n"
+        result="${result}Error, file \"$file\" is missing or empty\n"
     fi
 
     if [ -f "$file" ] && [ -s "$file" ] ; then
@@ -126,13 +121,12 @@ function parseInputFiles(){
             firstInvalidLine=$(grep -Evn "$LINE_REGEXP" $tmpFile | head -n 1)
             lineNumber=$(echo $firstInvalidLine | cut -f 1 -d ':')
             firstInvalidLine=$(grep -Ev "$LINE_REGEXP" $tmpFile | head -n 1)
-            result="${result}${RED_COLOR}Error in \"$file\", invalid line $lineNumber: \"$firstInvalidLine\"\n\tvalid line \"Team1-Team2:Goals1-Goals2\" should be matched by LINE_REGEXP=\"$LINE_REGEXP\" ${COLOR_OFF}\n"
+            result="${result}Error in \"$file\", invalid line $lineNumber: \"$firstInvalidLine\"\n\tvalid line \"Team1-Team2:Goals1-Goals2\" should be matched by LINE_REGEXP=\"$LINE_REGEXP\" \n"
         else
             if ! [ -z "$(grep -Ev "$LINE_REGEXP" $tmpFile)" ]; then
                 firstInvalidLine=$(grep -Evn "$LINE_REGEXP" $tmpFile | head -n 1)
                 lineNumber=$(echo $firstInvalidLine | cut -f 1 -d ':')
                 firstInvalidLine=$(grep -Ev "$LINE_REGEXP" $tmpFile | head -n 1)
-                printf "${YELLOW_COLOR}Error in \"$file\", spaces in team at line $lineNumber: \"$firstInvalidLine\"\n\tTrying to continue with spaces...${COLOR_OFF}\n"
                 normalizeFileWithSpaces
                 table="table.csv"
                 initializeStandings
