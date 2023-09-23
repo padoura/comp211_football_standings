@@ -1,0 +1,4 @@
+1.	Ajax	10	10-8
+2.	Marseille	10	10-8
+3.	AEK	6	8-9
+4.	Brighton	3	7-10

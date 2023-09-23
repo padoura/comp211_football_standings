@@ -1,0 +1,12 @@
+Ajax-Marseille:3-3 
+Brighton-AEK:2-3 
+AEK-Ajax:1-1
+Marseille-Brighton:2-1  
+Marseille-AEK:2-1
+Brighton-Ajax:1-1
+Marseille-Ajax:1-1
+AEK-Brighton:1-1 
+Ajax-AEK:2-1
+Brighton-Marseille:1-1  
+AEK-Marseille:1-1
+Ajax-Brighton:2-1
